@@ -62,6 +62,11 @@ class Robot(object):
         '''
         self.robot.drive_straight(speed)
 
+    def dock(self):
+        ''' seek docking
+        '''
+        self.robot.seek_dock()
+
     def setTurnSpeed(self, speed):
         '''
         Sets the robot's right turn speed.  

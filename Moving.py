@@ -48,32 +48,49 @@ time.sleep(7.13)
 # Stop
 bot.setTurnSpeed(0)
 
+#FWD
+bot.direct(100, 100)
+
+# Wait a second
+time.sleep(1)
+
+#Stop direct
+bot.direct(0, 0)
+
+#RVS
+bot.direct(-100, -100)
+
+# Wait a second
+time.sleep(1)
+
+#Stop direct
+bot.direct(0, 0)
+
+bot.direct(-100, 100)
+
+# Wait a second
+time.sleep(1)
+
+#Stop direct
+bot.direct(0, 0)
+
+bot.direct(100, -100)
+
+# Wait a second
+time.sleep(1)
+
+#Stop direct
+bot.direct(0, 0)
+
 #FWD movement
-bot.setForwardSpeed(500)
+#bot.setForwardSpeed(500)
 
-# Wait a second
-time.sleep(1)
 
 #FWD movement - stopping
-bot.setForwardSpeed(0)
+#bot.setForwardSpeed(0)
 
-# Tell the Create2 to turn CW slowly
-bot.setTurnSpeed(50)
-
-# Wait a second - allows turn of 180
-time.sleep(7.13)
-
-# Stop
-bot.setTurnSpeed(0)
-
- #FWD movement
-bot.setForwardSpeed(500)
-
-# Wait a second
-time.sleep(1)
-
-#FWD movement - stopping
-bot.setForwardSpeed(0)
+#Docking Seq
+#bot.dock()
 
 # Report bumper hits and wall proximity for 30 seconds
 start_time = time.time()
