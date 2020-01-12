@@ -40,47 +40,44 @@ bot.playNote('A4', 100)
 #while True:
 
 # Tell the Create2 to turn CCW slowly
-bot.setTurnSpeed(-50)
+#bot.setTurnSpeed(-50)
 
 # Wait a second allows turn of 180
-time.sleep(7.13)
+#time.sleep(7.13)
 
 # Stop
-bot.setTurnSpeed(0)
+#bot.setTurnSpeed(0)
 
 #FWD
-bot.direct(100, 100)
+bot.direct(250, 250)
+
+timer = 0
+sensors = []
+bot.cliffStream()
+while timer < 500 :
+    sensors = bot.sensor_state[0],\
+              bot.sensor_state[1],\
+              bot.sensor_state[2],\
+              bot.sensor_state[3]
+    print (sensors)
+    print ('/n')
+    timer = timer + 1
+    time.sleep(0.01)
 
 # Wait a second
-time.sleep(1)
+#time.sleep(1)
 
 #Stop direct
 bot.direct(0, 0)
 
-#RVS
-bot.direct(-100, -100)
 
-# Wait a second
-time.sleep(1)
 
-#Stop direct
-bot.direct(0, 0)
 
-bot.direct(-100, 100)
 
-# Wait a second
-time.sleep(1)
 
-#Stop direct
-bot.direct(0, 0)
 
-bot.direct(100, -100)
 
-# Wait a second
-time.sleep(1)
 
-#Stop direct
-bot.direct(0, 0)
 
 #FWD movement
 #bot.setForwardSpeed(500)
