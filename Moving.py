@@ -49,20 +49,17 @@ bot.playNote('A4', 100)
 #bot.setTurnSpeed(0)
 
 #FWD
-bot.direct(250, 250)
+bot.direct(30, 30)
 
+#recieve sensor data and stop at black line < 2000
 timer = 0
-sensors = []
-bot.cliffStream()
-while timer < 500 :
-    sensors = bot.sensor_state[0],\
-              bot.sensor_state[1],\
-              bot.sensor_state[2],\
-              bot.sensor_state[3]
-    print (sensors)
-    print ('/n')
-    timer = timer + 1
-    time.sleep(0.01)
+rightsensor = 2000
+leftsensor = 2000
+while rightsensor >= 2000 and leftsensor >=2000:
+    bot._get_sensor_packet()
+    leftsensor = bot.robot.sensor_state['cliff front left signal']
+    rightsensor = bot.robot.sensor_state['cliff front right signal']
+    time.sleep(0.015)
 
 # Wait a second
 #time.sleep(1)

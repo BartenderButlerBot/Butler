@@ -31,7 +31,7 @@ import time
 import pkg_resources
 
 class Robot(object):
-
+    
     def __init__(self, port='/dev/ttyUSB0', baud=115200):
         '''
         Connects to the Create2 on the specified port at the specified baud rate.
@@ -63,9 +63,16 @@ class Robot(object):
         self.robot.drive_straight(speed)
 
     def dock(self):
-        ''' seek docking
+        '''
+        seek docking
         '''
         self.robot.seek_dock()
+
+    def direct(self, rightspeed, leftspeed):
+        '''
+        direct drive
+        '''
+        self.robot.drive_direct(rightspeed, leftspeed)
 
     def setTurnSpeed(self, speed):
         '''
@@ -97,7 +104,14 @@ class Robot(object):
                self.robot.sensor_state['cliff front left'],\
                self.robot.sensor_state['cliff front right'],\
                self.robot.sensor_state['cliff right']
+    def cliffStream(self) :
+        '''
+        Our custom cliff sensor stream
+        '''
 
+        self.robot.stream()
+        
+   
     def getWallSensor(self):
         '''
         Returns wall sensor value as a number.  Larger number means closer to wall.
@@ -110,7 +124,8 @@ class Robot(object):
     def _get_sensor_packet(self):
 
         #Packet 100 contains all sensor data.
-        self.robot.get_packet(100)
+        #Packet 1 contains sensor data from packets 7-16
+        self.robot.get_packet(4)
 
 class _Error(Exception):
     """Error"""
@@ -408,11 +423,48 @@ class _Create2(object):
         else:
             raise _ROIFailedToSendError("Invalid data, failed to send")
         
-    
-    def drive_direct(self):
-        """Not implementing this for now.
+    # Main Movement Command 
+    def drive_direct(self, rightspeed, leftspeed):
         """
-        #self.SCI.send(self.config.data['opcodes']['start'],0)
+        Not implementing this for now.
+        It's cool fam, we got it.
+        """
+        
+        data = []
+        rs = None
+        ls = None
+        noError = True
+        
+        if rightspeed >= -500 and rightspeed <= 500:
+            rs = int(rightspeed) & 0xffff
+            #Convert 16bit rightspeed to Hex
+        else:
+            noError = False
+            raise _ROIDataByteError("Invalid rightspeed input")
+
+        if leftspeed >= -500 and leftspeed <= 500:
+            ls = int(leftspeed) & 0xffff
+            #Convert 16bit leftspeed to Hex
+        else:
+            noError = False
+            raise _ROIDataByteError("Invalid leftspeed input")
+    
+        if noError:
+            data = struct.unpack('4B', struct.pack('>2H', rs, ls))
+            #An example of what data looks like:
+            #print data >> (255, 56, 1, 244)
+            
+            #data[0] = Velocity high byte
+            #data[1] = Velocity low byte
+            #data[2] = Radius high byte
+            #data[3] = Radius low byte
+            
+            #Normally we would convert data to a tuple before sending it to SCI
+            #   But struct.unpack already returns a tuple.
+            
+            self.SCI.send(self.config.data['opcodes']['drive_direct'],data)
+        else:
+            raise _ROIFailedToSendError("Invalid data, failed to send")
     
     def drive_pwm(self):
         """Not implementing this for now.
@@ -671,9 +723,36 @@ class _Create2(object):
         #self.SCI.send(self.config.data['opcodes']['start'],0)
     
     def stream(self):
-        """Not implementing this for now.
         """
-        #self.SCI.send(self.config.data['opcodes']['start'],0)
+        Not implementing this for now.
+        No worries bro, we got this.
+        """
+        data = []
+        noError = True
+        
+        byte1 = int(4) & 0xffff
+        byte2 = int(9) & 0xffff
+        byte3 = int(10) & 0xffff
+        byte4 = int(11) & 0xffff
+        byte5 = int(12) & 0xffff
+        #Convert 16bit rightspeed to Hex
+
+        if noError:
+            data = struct.unpack('5B', struct.pack('>5B', byte1, byte2, byte3, byte4, byte5))
+            #An example of what data looks like:
+            #print data >> (255, 56, 1, 244)
+            
+            #data[0] = Velocity high byte
+            #data[1] = Velocity low byte
+            #data[2] = Radius high byte
+            #data[3] = Radius low byte
+            
+            #Normally we would convert data to a tuple before sending it to SCI
+            #   But struct.unpack already returns a tuple.
+            
+            self.SCI.send(self.config.data['opcodes']['stream'],data)
+        else:
+            raise _ROIFailedToSendError("Invalid data, failed to send")
     
     def pause_resume_stream(self):
         """Not implementing this for now.
