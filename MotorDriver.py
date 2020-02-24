@@ -9,7 +9,7 @@ bot = Robot(port = '/dev/ttyUSB0')
 bot.playNote('A4', 100)
 
 #Turn on MD
-bot.motordriver(127)
+bot.motordriver(128)
 
 
 # Wait
