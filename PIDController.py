@@ -23,6 +23,39 @@ IO.setup(22,IO.OUT) #GPIO 22 -> S0
 IO.setup(23,IO.OUT) #GPIO 23 -> S1
 IO.setup(24,IO.OUT) #GPIO 24 -> S2
 
+#LOAD SENSOR SETUP
+import time
+import sys
+
+EMULATE_HX711=False
+
+referenceUnit = 1
+
+if not EMULATE_HX711:
+    import RPi.GPIO as GPIO
+    from hx711 import HX711
+else:
+    from emulated_hx711 import HX711
+
+def cleanAndExit():
+    print("Cleaning...")
+
+    if not EMULATE_HX711:
+        GPIO.cleanup()
+        
+    print("Bye!")
+    sys.exit()
+
+hx = HX711(17, 18)
+
+hx.set_reading_format("MSB", "MSB")
+
+hx.reset()
+
+hx.tare()
+
+print("Tare done! Add weight now...")
+
 #PID Initialization
 error = 0
 preverror = 0
@@ -71,7 +104,7 @@ def PIDCalc():
     global rightms
     derivative = error-preverror
     integral += error
-    motorchange = (1*error) + (45*derivative) + (0.01*integral)
+    motorchange = (1*error) + (30*derivative) + (0.01*integral)
     leftms -= motorchange
     rightms += motorchange
     if leftms >= 500:
@@ -83,6 +116,25 @@ def PIDCalc():
     if rightms <= -500:
         rightms=-500
     preverror = error
+
+while True:
+    try:
+        val = hx.get_weight(17)
+        if val >= 100000:
+            time.sleep(1)
+            if val >= 100000:
+                break
+        else:
+            print("Waiting...")
+
+    except (KeyboardInterrupt, SystemExit):
+        cleanAndExit()
+
+bot.safe()
+bot.direct(-100,-100)
+time.sleep(0.5)
+bot.direct(0,0)
+time.sleep(0.25)
 
 while True:
 
@@ -125,6 +177,8 @@ while True:
         bot.direct(0,0)
         time.sleep(1)
         bot.playNote('A4', 100)
+        bot.direct(100, -100)
+        time.sleep(1)
         bot.dock()
         break
     
@@ -132,6 +186,6 @@ while True:
     PIDCalc()
     rightms = round(rightms)
     leftms = round(leftms)
-    bot.direct(rightms, leftms)
+    bot.direct(-leftms, -rightms)
     print(array)
     print(rightms, leftms)
